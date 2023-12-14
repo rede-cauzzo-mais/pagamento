@@ -28,7 +28,7 @@
             "src/helpers.php"
         ],
         "psr-4": {
-            "RedeCauzzoMais\\Pagamento": "src/"
+            "RedeCauzzoMais\\Pagamento\\": "src/"
         }
     },
     "config": {
