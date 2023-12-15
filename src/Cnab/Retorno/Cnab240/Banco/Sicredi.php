@@ -5,18 +5,14 @@ namespace RedeCauzzoMais\Pagamento\Cnab\Retorno\Cnab240\Banco;
 use Exception;
 use RedeCauzzoMais\Pagamento\Cnab\Retorno\Cnab240\AbstractRetorno;
 use RedeCauzzoMais\Pagamento\Cnab\Retorno\Cnab240\Detalhe;
-use RedeCauzzoMais\Pagamento\Contracts\Boleto\Boleto as BoletoContract;
 use RedeCauzzoMais\Pagamento\Contracts\Conta as ContaContract;
 use RedeCauzzoMais\Pagamento\Contracts\Cnab\RetornoCnab240;
+use RedeCauzzoMais\Pagamento\Contracts\Pagamento\Pagamento;
 use RedeCauzzoMais\Pagamento\Util;
 
-/**
- * Class Sicredi
- * @package RedeCauzzoMais\Pagamento\Cnab\Retorno\Cnab240\Banco
- */
 class Sicredi extends AbstractRetorno implements RetornoCnab240
 {
-    protected $codigoBanco = BoletoContract::COD_BANCO_SICREDI;
+    protected $codigoBanco = Pagamento::COD_BANCO_SICREDI;
 
     private array $ocorrencias = [
         '00' => 'Crédito ou débito efetivado à indica que o pagamento foi confirmado',
@@ -160,13 +156,7 @@ class Sicredi extends AbstractRetorno implements RetornoCnab240
         ];
     }
 
-    /**
-     * @param array $header
-     *
-     * @return bool
-     * @throws Exception
-     */
-    protected function processarHeader( array $header )
+    protected function processarHeader( array $header ): bool
     {
         $this->getHeader()
              ->setCodBanco( $this->rem( 1, 3, $header ) )
@@ -195,13 +185,7 @@ class Sicredi extends AbstractRetorno implements RetornoCnab240
         return true;
     }
 
-    /**
-     * @param array $headerLote
-     *
-     * @return bool
-     * @throws Exception
-     */
-    protected function processarHeaderLote( array $headerLote )
+    protected function processarHeaderLote( array $headerLote ): bool
     {
         $this->getHeaderLote()
              ->setCodBanco( $this->rem( 1, 3, $headerLote ) )
@@ -222,13 +206,7 @@ class Sicredi extends AbstractRetorno implements RetornoCnab240
         return true;
     }
 
-    /**
-     * @param array $detalhe
-     *
-     * @return bool
-     * @throws Exception
-     */
-    protected function processarDetalhe( array $detalhe )
+    protected function processarDetalhe( array $detalhe ): bool
     {
         /** @var Detalhe $d */
         $d = $this->detalheAtual();
@@ -244,7 +222,7 @@ class Sicredi extends AbstractRetorno implements RetornoCnab240
               ->setNossoNumero( $this->rem( 135, 154, $detalhe ) )
               ->setNumeroDocumento( $this->rem( 74, 93, $detalhe ) )
               ->setDataCredito( $this->rem( 94, 101, $detalhe ) )
-              ->setValor( Util::nFloat( $this->rem( 120, 134, $detalhe ) / 100, 2, false ) );
+              ->setValor( Util::toFloat( $this->rem( 120, 134, $detalhe ) / 100, 2, false ) );
 
             $d->getContaFavorecido()->getPessoa()->setNome( $this->rem( 44, 73, $detalhe ) );
             $d->getContaFavorecido()
@@ -258,10 +236,10 @@ class Sicredi extends AbstractRetorno implements RetornoCnab240
 
         if ( $this->getSegmentType( $detalhe ) == 'B' ) {
             $d->setDataVencimento( $this->rem( 128, 135, $detalhe ) )
-              ->setValorAbatimento( Util::nFloat( $this->rem( 151, 165, $detalhe ) / 100, 2, false ) )
-              ->setValorDesconto( Util::nFloat( $this->rem( 166, 180, $detalhe ) / 100, 2, false ) )
-              ->setValorMora( Util::nFloat( $this->rem( 181, 195, $detalhe ) / 100, 2, false ) )
-              ->setValorMulta( Util::nFloat( $this->rem( 196, 210, $detalhe ) / 100, 2, false ) );
+              ->setValorAbatimento( Util::toFloat( $this->rem( 151, 165, $detalhe ) / 100, 2, false ) )
+              ->setValorDesconto( Util::toFloat( $this->rem( 166, 180, $detalhe ) / 100, 2, false ) )
+              ->setValorMora( Util::toFloat( $this->rem( 181, 195, $detalhe ) / 100, 2, false ) )
+              ->setValorMulta( Util::toFloat( $this->rem( 196, 210, $detalhe ) / 100, 2, false ) );
 
             $documento = $this->rem( 19, 32, $detalhe );
 
@@ -289,10 +267,10 @@ class Sicredi extends AbstractRetorno implements RetornoCnab240
         }
 
         if ( $this->getSegmentType( $detalhe ) == 'U' ) {
-            $d->setValorDesconto( Util::nFloat( $this->rem( 33, 47, $detalhe ) / 100, 2, false ) )
-              ->setValorAbatimento( Util::nFloat( $this->rem( 48, 62, $detalhe ) / 100, 2, false ) )
-              ->setValorIOF( Util::nFloat( $this->rem( 63, 77, $detalhe ) / 100, 2, false ) )
-              ->setValorRecebido( Util::nFloat( $this->rem( 93, 107, $detalhe ) / 100, 2, false ) )
+            $d->setValorDesconto( Util::toFloat( $this->rem( 33, 47, $detalhe ) / 100, 2, false ) )
+              ->setValorAbatimento( Util::toFloat( $this->rem( 48, 62, $detalhe ) / 100, 2, false ) )
+              ->setValorIOF( Util::toFloat( $this->rem( 63, 77, $detalhe ) / 100, 2, false ) )
+              ->setValorRecebido( Util::toFloat( $this->rem( 93, 107, $detalhe ) / 100, 2, false ) )
               ->setDataOcorrencia( $this->rem( 138, 145, $detalhe ) )
               ->setDataCredito( $this->rem( 146, 153, $detalhe ) );
         }
@@ -330,30 +308,18 @@ class Sicredi extends AbstractRetorno implements RetornoCnab240
         return true;
     }
 
-    /**
-     * @param array $trailer
-     *
-     * @return bool
-     * @throws Exception
-     */
-    protected function processarTrailerLote( array $trailer )
+    protected function processarTrailerLote( array $trailer ): bool
     {
         $this->getTrailerLote()
              ->setLoteServico( $this->rem( 4, 7, $trailer ) )
              ->setTipoRegistro( $this->rem( 8, 8, $trailer ) )
              ->setQtdRegistroLote( (int) $this->rem( 18, 23, $trailer ) )
-             ->setValorTotalTitulos( Util::nFloat( $this->rem( 24, 41, $trailer ) / 100, 2, false ) );
+             ->setValorTotalTitulos( Util::toFloat( $this->rem( 24, 41, $trailer ) / 100, 2, false ) );
 
         return true;
     }
 
-    /**
-     * @param array $trailer
-     *
-     * @return bool
-     * @throws Exception
-     */
-    protected function processarTrailer( array $trailer )
+    protected function processarTrailer( array $trailer ): bool
     {
         $this->getTrailer()
              ->setNumeroLote( $this->rem( 4, 7, $trailer ) )

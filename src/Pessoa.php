@@ -2,144 +2,67 @@
 
 namespace RedeCauzzoMais\Pagamento;
 
-use Exception;
 use RedeCauzzoMais\Pagamento\Contracts\Pessoa as PessoaContract;
+use Exception;
 
-/**
- * Class Pessoa
- * @package RedeCauzzoMais\Pagamento
- */
 class Pessoa implements PessoaContract
 {
-    /**
-     * @var string
-     */
-    protected $nome;
+    protected string $nome;
+    protected string $endereco;
+    protected string $numero;
+    protected string $complemento;
+    protected string $bairro;
+    protected string $cep;
+    protected string $uf;
+    protected string $cidade;
+    protected string $documento;
 
-    /**
-     * @var string
-     */
-    protected $endereco;
-
-    /**
-     * @var string
-     */
-    protected $numero;
-
-    /**
-     * @var string
-     */
-    protected $complemento;
-
-    /**
-     * @var string
-     */
-    protected $bairro;
-
-    /**
-     * @var string
-     */
-    protected $cep;
-
-    /**
-     * @var string
-     */
-    protected $uf;
-
-    /**
-     * @var string
-     */
-    protected $cidade;
-
-    /**
-     * @var string
-     */
-    protected $documento;
-
-    /**
-     * Cria a pessoa passando os parametros.
-     *
-     * @param      $nome
-     * @param      $documento
-     * @param null $endereco
-     * @param null $cep
-     * @param null $cidade
-     * @param null $uf
-     *
-     * @return Pessoa
-     */
-    public static function create( $nome, $documento, $endereco = null, $bairro = null, $cep = null, $cidade = null, $uf = null )
-    {
-        return new static( ['nome' => $nome, 'endereco' => $endereco, 'bairro' => $bairro, 'cep' => $cep, 'uf' => $uf, 'cidade' => $cidade, 'documento' => $documento,] );
-    }
-
-    /**
-     * Construtor
-     *
-     * @param array $params
-     */
     public function __construct( $params = [] )
     {
         Util::fillClass( $this, $params );
     }
 
-    /**
-     * Define o CEP
-     *
-     * @param string $cep
-     *
-     * @return Pessoa
-     */
-    public function setCep( $cep )
+    public static function create( $nome, $documento, $endereco = null, $bairro = null, $cep = null, $cidade = null, $uf = null ): static
+    {
+        return new static( [
+            'nome'      => $nome,
+            'endereco'  => $endereco,
+            'bairro'    => $bairro,
+            'cep'       => $cep,
+            'uf'        => $uf,
+            'cidade'    => $cidade,
+            'documento' => $documento,
+        ] );
+    }
+
+    public function setCep( $cep ): Pessoa
     {
         $this->cep = $cep;
 
         return $this;
     }
 
-    /**
-     * Retorna o CEP
-     *
-     * @return string
-     */
     public function getCep()
     {
-        return Util::maskString( Util::onlyNumbers( $this->cep ), '#####-###' );
+        return Util::toMask( Util::onlyNumbers( $this->cep ), '#####-###' );
     }
 
-    /**
-     * Define a cidade
-     *
-     * @param string $cidade
-     *
-     * @return Pessoa
-     */
-    public function setCidade( $cidade )
+    public function setCidade( $cidade ): Pessoa
     {
         $this->cidade = $cidade;
 
         return $this;
     }
 
-    /**
-     * Retorna a cidade
-     *
-     * @return string
-     */
-    public function getCidade()
+    public function getCidade(): string
     {
         return $this->cidade;
     }
 
     /**
-     * Define o documento (CPF, CNPJ ou CEI)
-     *
-     * @param string $documento
-     *
-     * @return Pessoa
      * @throws Exception
      */
-    public function setDocumento( $documento )
+    public function setDocumento( $documento ): Pessoa
     {
         $documento = substr( Util::onlyNumbers( $documento ), -14 );
 
@@ -152,126 +75,68 @@ class Pessoa implements PessoaContract
         return $this;
     }
 
-    /**
-     * Retorna o documento (CPF ou CNPJ)
-     *
-     * @return string
-     */
     public function getDocumento()
     {
         if ( $this->getTipoDocumento() == 'CPF' ) {
-            return Util::maskString( Util::onlyNumbers( $this->documento ), '###.###.###-##' );
+            return Util::toMask( Util::onlyNumbers( $this->documento ), '###.###.###-##' );
         }
 
         if ( $this->getTipoDocumento() == 'CEI' ) {
-            return Util::maskString( Util::onlyNumbers( $this->documento ), '##.#####.#-##' );
+            return Util::toMask( Util::onlyNumbers( $this->documento ), '##.#####.#-##' );
         }
 
-        return Util::maskString( Util::onlyNumbers( $this->documento ), '##.###.###/####-##' );
+        return Util::toMask( Util::onlyNumbers( $this->documento ), '##.###.###/####-##' );
     }
 
-    /**
-     * Define o endereço
-     *
-     * @param string $endereco
-     *
-     * @return Pessoa
-     */
-    public function setEndereco( $endereco )
+    public function setEndereco( $endereco ): Pessoa
     {
         $this->endereco = $endereco;
 
         return $this;
     }
 
-    /**
-     * Retorna o endereço
-     *
-     * @return string
-     */
-    public function getEndereco()
+    public function getEndereco(): string
     {
         return $this->endereco;
     }
 
-    /**
-     * Define o bairro
-     *
-     * @param string $bairro
-     *
-     * @return Pessoa
-     */
-    public function setBairro( $bairro )
+    public function setBairro( $bairro ): Pessoa
     {
         $this->bairro = $bairro;
 
         return $this;
     }
 
-    /**
-     * Retorna o bairro
-     *
-     * @return string
-     */
-    public function getBairro()
+    public function getBairro(): string
     {
         return $this->bairro;
     }
 
-    /**
-     * Define o nome
-     *
-     * @param string $nome
-     *
-     * @return Pessoa
-     */
-    public function setNome( $nome )
+    public function setNome( $nome ): Pessoa
     {
         $this->nome = $nome;
 
         return $this;
     }
 
-    /**
-     * Retorna o nome
-     *
-     * @return string
-     */
-    public function getNome()
+    public function getNome(): string
     {
         return $this->nome;
     }
 
-    /**
-     * Define a UF
-     *
-     * @param string $uf
-     *
-     * @return Pessoa
-     */
-    public function setUf( $uf )
+    public function setUf( $uf ): Pessoa
     {
         $this->uf = $uf;
 
         return $this;
     }
 
-    /**
-     * Retorna a UF
-     *
-     * @return string
-     */
-    public function getUf()
+    public function getUf(): string
     {
         return $this->uf;
     }
 
-    /**
-     * Retorna o nome e o documento formatados
-     *
-     * @return string
-     */
-    public function getNomeDocumento()
+    public function getNomeDocumento(): string
     {
         if ( !$this->getDocumento() ) {
             return $this->getNome();
@@ -280,12 +145,7 @@ class Pessoa implements PessoaContract
         return $this->getNome() . ' / ' . $this->getTipoDocumento() . ': ' . $this->getDocumento();
     }
 
-    /**
-     * Retorna se o tipo do documento é CPF ou CNPJ ou Documento
-     *
-     * @return string
-     */
-    public function getTipoDocumento()
+    public function getTipoDocumento(): string
     {
         $cpf_cnpj_cei = Util::onlyNumbers( $this->documento );
 
@@ -300,13 +160,6 @@ class Pessoa implements PessoaContract
         return 'CNPJ';
     }
 
-    /**
-     * Retorna o endereço formatado para a linha 2 de endereço
-     *
-     * Ex: 71000-000 - Brasília - DF
-     *
-     * @return string
-     */
     public function getCepCidadeUf()
     {
         $dados = array_filter( [$this->getCep(), $this->getCidade(), $this->getUf()] );
@@ -314,41 +167,42 @@ class Pessoa implements PessoaContract
         return implode( ' - ', $dados );
     }
 
-    public function setNumero( $numero )
+    public function setNumero( $numero ): Pessoa
     {
         $this->numero = $numero;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getNumero()
+    public function getNumero(): string
     {
         return $this->numero;
     }
 
-    public function setComplemento( $complemento )
+    public function setComplemento( $complemento ): Pessoa
     {
         $this->complemento = $complemento;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getComplemento()
+    public function getComplemento(): string
     {
         return $this->complemento;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
-        return ['nome' => $this->getNome(), 'endereco' => $this->getEndereco(), 'bairro' => $this->getBairro(), 'cep' => $this->getCep(), 'uf' => $this->getUf(), 'cidade' => $this->getCidade(), 'documento' => $this->getDocumento(), 'nome_documento' => $this->getNomeDocumento(), 'endereco2' => $this->getCepCidadeUf(),];
+        return [
+            'nome'           => $this->getNome(),
+            'endereco'       => $this->getEndereco(),
+            'bairro'         => $this->getBairro(),
+            'cep'            => $this->getCep(),
+            'uf'             => $this->getUf(),
+            'cidade'         => $this->getCidade(),
+            'documento'      => $this->getDocumento(),
+            'nome_documento' => $this->getNomeDocumento(),
+            'endereco2'      => $this->getCepCidadeUf(),
+        ];
     }
 }

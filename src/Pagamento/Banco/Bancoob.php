@@ -16,11 +16,12 @@ class Bancoob extends AbstractPagamento implements PagamentoContract
 
     /**
      * Sicredi constructor.
+     *
      * @param array $params
      */
-    public function __construct(array $params = [])
+    public function __construct( array $params = [] )
     {
-        parent::__construct($params);
+        parent::__construct( $params );
     }
 
     /**
@@ -28,8 +29,9 @@ class Bancoob extends AbstractPagamento implements PagamentoContract
      */
     public function getInstrucaoMovimento()
     {
-        if ($this->getTipoMovimento() === PagamentoContract::TIPO_MOVIMENTO_EXCLUSAO)
+        if ( $this->getTipoMovimento() === PagamentoContract::TIPO_MOVIMENTO_EXCLUSAO ) {
             return self::EXCLUSAO_REGISTRO_INCLUIDO;
+        }
 
         return self::INCLUSAO_REGISTRO_LIBERADO;
     }

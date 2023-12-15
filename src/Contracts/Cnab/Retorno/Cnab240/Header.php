@@ -1,102 +1,44 @@
 <?php
+
 namespace RedeCauzzoMais\Pagamento\Contracts\Cnab\Retorno\Cnab240;
 
 interface Header
 {
-    /**
-     * @return string
-     */
-    public function getLoteServico();
+    public function getLoteServico(): string;
 
-    /**
-     * @return string
-     */
-    public function getTipoRegistro();
+    public function getTipoRegistro(): string;
 
-    /**
-     * @return string
-     */
-    public function getTipoInscricao();
+    public function getTipoInscricao(): string;
 
-    /**
-     * @return string
-     */
-    public function getAgencia();
+    public function getAgencia(): string;
 
-    /**
-     * @return string
-     */
-    public function getAgenciaDv();
+    public function getAgenciaDv(): string;
 
-    /**
-     * @return string
-     */
-    public function getNomeEmpresa();
+    public function getNomeEmpresa(): string;
 
-    /**
-     * @return string
-     */
-    public function getDocumentoEmpresa();
+    public function getDocumentoEmpresa(): string;
 
-    /**
-     * @return string
-     */
-    public function getNumeroSequencialArquivo();
+    public function getNumeroSequencialArquivo(): string;
 
-    /**
-     * @return string
-     */
-    public function getVersaoLayoutArquivo();
+    public function getVersaoLayoutArquivo(): string;
 
-    /**
-     * @return string
-     */
-    public function getNumeroInscricao();
+    public function getNumeroInscricao(): string;
 
-    /**
-     * @return string
-     */
-    public function getConta();
+    public function getConta(): string;
 
-    /**
-     * @return string
-     */
-    public function getContaDv();
+    public function getContaDv(): string;
 
-    /**
-     * @return string
-     */
-    public function getCodigoCedente();
+    public function getCodigoCedente(): string;
 
-    /**
-     * @param string $format
-     *
-     * @return string
-     */
-    public function getData($format = 'd/m/Y');
+    public function getData( $format = 'd/m/Y' ): ?string;
 
-    /**
-     * @return string
-     */
-    public function getConvenio();
+    public function getConvenio(): string;
 
-    /**
-     * @return int
-     */
-    public function getCodBanco();
+    public function getCodBanco(): int;
 
-    /**
-     * @return int
-     */
-    public function getCodigoRemessaRetorno();
+    public function getCodigoRemessaRetorno(): int;
 
-    /**
-     * @return string
-     */
-    public function getNomeBanco();
+    public function getNomeBanco(): string;
 
-    /**
-     * @return array
-     */
-    public function toArray();
+    public function toArray(): array;
 }

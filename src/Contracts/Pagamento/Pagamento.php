@@ -4,11 +4,8 @@ namespace RedeCauzzoMais\Pagamento\Contracts\Pagamento;
 
 use Carbon\Carbon;
 use RedeCauzzoMais\Pagamento\Contracts\Pessoa as PessoaContract;
+use RedeCauzzoMais\Pagamento\Pessoa;
 
-/**
- * Interface Pagamento
- * @package RedeCauzzoMais\Pagamento\Contracts\Pagamento
- */
 interface Pagamento
 {
     const COD_BANCO_BB        = '001';
@@ -32,78 +29,35 @@ interface Pagamento
     const CHAVE_PIX_CNPJ      = '03';
     const CHAVE_PIX_ALEATORIA = '04';
 
-    /**
-     * @return mixed
-     */
     public function getBanco();
 
-    /**
-     * @return mixed
-     */
     public function getAgencia();
 
-    /**
-     * @return mixed
-     */
     public function getAgenciaDv();
 
-    /**
-     * @return mixed
-     */
     public function getTipoMovimento();
 
-    /**
-     * @return mixed
-     */
     public function getInstrucaoMovimento();
 
-    /**
-     * @return mixed
-     */
     public function getTipoMoeda();
 
-    /**
-     * @return mixed
-     */
     public function getFinalidade();
 
-    /**
-     * @return mixed
-     */
     public function getFinalidadesTED();
 
-    /**
-     * @return PessoaContract
-     */
     public function getFavorecido();
 
-    /**
-     * @return mixed
-     */
     public function getConta();
 
-    /**
-     * @return mixed
-     */
     public function getContaDv();
 
-    /**
-     * @return mixed
-     */
     public function getNumeroDocumento();
 
-    /**
-     * @return Carbon
-     */
     public function getData();
 
-    /**
-     * @return mixed
-     */
     public function getValor();
 
     public function getPixTipo();
 
     public function getPixChave();
-
 }

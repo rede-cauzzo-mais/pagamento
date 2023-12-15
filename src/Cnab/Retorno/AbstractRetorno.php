@@ -1,281 +1,149 @@
 <?php
+
 namespace RedeCauzzoMais\Pagamento\Cnab\Retorno;
 
+use Countable;
 use Exception;
+use Illuminate\Support\Collection;
 use RedeCauzzoMais\Pagamento\Contracts\Cnab\Retorno\Cnab240\Detalhe as Detalhe240Contract;
 use RedeCauzzoMais\Pagamento\Contracts\Cnab\Retorno\Cnab240\Header as Header240Contract;
 use RedeCauzzoMais\Pagamento\Contracts\Cnab\Retorno\Cnab240\Trailer as Trailer240Contract;
-use RedeCauzzoMais\Pagamento\Support\Collection;
 use RedeCauzzoMais\Pagamento\Util;
 use OutOfBoundsException;
+use SeekableIterator;
 
-/**
- * Class AbstractRetorno
- * @package RedeCauzzoMais\Pagamento\Cnab\Retorno
- */
-abstract class AbstractRetorno implements \Countable, \SeekableIterator
+abstract class AbstractRetorno implements Countable, SeekableIterator
 {
-    /**
-     * Se Cnab ja foi processado
-     *
-     * @var bool
-     */
     protected $processado = false;
-
-    /**
-     * Código do banco
-     *
-     * @var string
-     */
     protected $codigoBanco;
-
-    /**
-     * Incremeto de detalhes
-     *
-     * @var int
-     */
-    protected $increment = 0;
-
-    /**
-     * Arquivo transformado em array por linha.
-     *
-     * @var array
-     */
+    protected $increment  = 0;
     protected $file;
-
-    /**
-     * @var Header240Contract
-     */
     protected $header;
-
-    /**
-     * @var Trailer240Contract
-     */
     protected $trailer;
+    protected $detalhe    = [];
+    protected $totais     = [];
+    private   $_position  = 1;
 
-    /**
-     * @var Detalhe240Contract[]
-     */
-    protected $detalhe = [];
-
-    /**
-     * Helper de totais.
-     *
-     * @var array
-     */
-    protected $totais = [];
-
-    /**
-     * @var int
-     */
-    private $_position = 1;
-
-    /**
-     *
-     * @param String $file
-     * @throws Exception
-     */
-    public function __construct($file)
+    public function __construct( $file )
     {
         $this->_position = 1;
 
-        if (!$this->file = Util::file2array($file)) {
-            throw new Exception('Arquivo: não existe');
+        if ( !$this->file = Util::file2array( $file ) ) {
+            throw new Exception( 'Arquivo: não existe' );
         }
 
-        $r = new \ReflectionClass('\RedeCauzzoMais\Pagamento\Contracts\Boleto\Boleto');
-        $constantNames = $r->getConstants();
+        $r                 = new \ReflectionClass( '\RedeCauzzoMais\Pagamento\Contracts\Boleto\Boleto' );
+        $constantNames     = $r->getConstants();
         $bancosDisponiveis = [];
-        foreach ($constantNames as $constantName => $codigoBanco) {
-            if (preg_match('/^COD_BANCO.*/', $constantName)) {
+        foreach ( $constantNames as $constantName => $codigoBanco ) {
+            if ( preg_match( '/^COD_BANCO.*/', $constantName ) ) {
                 $bancosDisponiveis[] = $codigoBanco;
             }
         }
 
-        if (!Util::isHeaderRetorno($this->file[0])) {
-            throw new Exception(sprintf('Arquivo de retorno inválido'));
+        if ( !Util::isHeaderRetorno( $this->file[0] ) ) {
+            throw new Exception( sprintf( 'Arquivo de retorno inválido' ) );
         }
 
-        $banco = Util::isCnab400($this->file[0]) ? substr($this->file[0], 76, 3) : substr($this->file[0], 0, 3);
-        if (!in_array($banco, $bancosDisponiveis)) {
-            throw new Exception(sprintf('Banco: %s, inválido', $banco));
+        $banco = Util::isCnab400( $this->file[0] ) ? substr( $this->file[0], 76, 3 ) : substr( $this->file[0], 0, 3 );
+        if ( !in_array( $banco, $bancosDisponiveis ) ) {
+            throw new Exception( sprintf( 'Banco: %s, inválido', $banco ) );
         }
     }
 
-    /**
-     * Retorna o código do banco
-     *
-     * @return string
-     */
-    public function getCodigoBanco()
+    public function getCodigoBanco(): string
     {
         return $this->codigoBanco;
     }
 
-    /**
-     * @return mixed
-     */
     public function getBancoNome()
     {
         return Util::$bancos[$this->codigoBanco];
     }
 
-    /**
-     * @return Collection
-     */
-    public function getDetalhes()
+    public function getDetalhes(): Collection
     {
-        return new Collection($this->detalhe);
+        return new Collection( $this->detalhe );
     }
 
-    /**
-     * @param $i
-     *
-     * @return Detalhe240Contract[]
-     */
-    public function getDetalhe($i)
+    public function getDetalhe( $i ): ?Detalhe240Contract
     {
-        return array_key_exists($i, $this->detalhe) ? $this->detalhe[$i] : null;
+        return array_key_exists( $i, $this->detalhe ) ? $this->detalhe[$i] : null;
     }
 
-    /**
-     * @return Header240Contract
-     */
-    public function getHeader()
+    public function getHeader(): Header240Contract
     {
         return $this->header;
     }
 
-    /**
-     * @return Trailer240Contract
-     */
-    public function getTrailer()
+    public function getTrailer(): Trailer240Contract
     {
         return $this->trailer;
     }
 
-    /**
-     * Retorna o detalhe atual.
-     *
-     * @return Detalhe240Contract
-     */
-    protected function detalheAtual()
+    protected function detalheAtual(): Detalhe240Contract
     {
         return $this->detalhe[$this->increment];
     }
 
-    /**
-     * Se esta processado
-     *
-     * @return bool
-     */
-    protected function isProcessado()
+    protected function isProcessado(): bool
     {
         return $this->processado;
     }
 
-    /**
-     * Seta cnab como processado
-     *
-     * @return $this
-     */
     protected function setProcessado()
     {
         $this->processado = true;
+
         return $this;
     }
 
-    /**
-     * Incrementa o detalhe.
-     */
     abstract protected function incrementDetalhe();
 
-    /**
-     * Processa o arquivo
-     *
-     * @return $this
-     */
     abstract protected function processar();
 
-    /**
-     * Retorna o array.
-     *
-     * @return array
-     */
-    abstract protected function toArray();
+    abstract protected function toArray(): array;
 
-    /**
-     * Remove trecho do array.
-     *
-     * @param $i
-     * @param $f
-     * @param $array
-     *
-     * @return string
-     * @throws Exception
-     */
-    protected function rem($i, $f, &$array)
+    protected function rem( $i, $f, &$array ): string
     {
-        return Util::remove($i, $f, $array);
+        return Util::removeInPosition( $i, $f, $array );
     }
 
-
-    /**
-     * @return mixed|Detalhe240Contract
-     */
     public function current()
     {
         return $this->detalhe[$this->_position];
     }
 
-    /**
-     *
-     */
     public function next()
     {
         ++$this->_position;
     }
 
-    /**
-     * @return bool|float|int|string|null
-     */
     public function key()
     {
         return $this->_position;
     }
 
-    /**
-     * @return bool
-     */
     public function valid()
     {
-        return isset($this->detalhe[$this->_position]);
+        return isset( $this->detalhe[$this->_position] );
     }
 
-    /**
-     *
-     */
     public function rewind()
     {
         $this->_position = 1;
     }
 
-    /**
-     * @return int
-     */
-    public function count()
+    public function count(): int
     {
-        return count($this->detalhe);
+        return count( $this->detalhe );
     }
 
-    /**
-     * @param int $position
-     */
-    public function seek($position)
+    public function seek( $position )
     {
         $this->_position = $position;
-        if (!$this->valid()) {
-            throw new OutOfBoundsException('"Posição inválida "$position"');
+        if ( !$this->valid() ) {
+            throw new OutOfBoundsException( '"Posição inválida "$position"' );
         }
     }
 }

@@ -1,227 +1,138 @@
 <?php
+
 namespace RedeCauzzoMais\Pagamento;
 
 use RedeCauzzoMais\Pagamento\Contracts\Conta as ContaContract;
 use RedeCauzzoMais\Pagamento\Contracts\Pessoa as PessoaContract;
 
-/**
- * Class Conta
- * @package RedeCauzzoMais\Pagamento
- */
 class Conta implements ContaContract
 {
-    /**
-     * @var string
-     */
-    protected $banco;
+    protected string $banco;
+    protected string $bancoNome;
+    protected string $agencia;
+    protected string $agenciaDv;
+    protected string $conta;
+    protected string $contaDv;
 
-    /**
-     * @var string
-     */
-    protected $bancoNome;
+    protected PessoaContract $pessoa;
 
-    /**
-     * @var string
-     */
-    protected $agencia;
-
-    /**
-     * @var string
-     */
-    protected $agenciaDv;
-
-    /**
-     * @var string
-     */
-    protected $conta;
-
-    /**
-     * @var string
-     */
-    protected $contaDv;
-
-    /**
-     * @var PessoaContract
-     */
-    protected $pessoa;
-
-    /**
-     * Cria a conta passando os parametros.
-     *
-     * @param $banco
-     * @param $agencia
-     * @param $agenciaDv
-     * @param $conta
-     * @param $contaDv
-     * @param $pessoa
-     * @return Conta
-     */
-    public static function create($banco, $agencia, $agenciaDv, $conta, $contaDv, $pessoa)
+    public function __construct( $params = [] )
     {
-        return new static([
-            'banco' => $banco,
-            'agencia' => $agencia,
-            'agenciaDv' => $agenciaDv,
-            'conta' => $conta,
-            'contaDv' => $contaDv,
-            'pessoa' => $pessoa,
-        ]);
-    }
-
-    /**
-     * Construtor
-     *
-     * @param array $params
-     */
-    public function __construct($params = [])
-    {
-        if (isset($params['pessoa']) && !($params['pessoa'] instanceof Pessoa)) {
-            $params['pessoa'] = new Pessoa($params['pessoa']);
+        if ( isset( $params['pessoa'] ) and !( $params['pessoa'] instanceof Pessoa ) ) {
+            $params['pessoa'] = new Pessoa( $params['pessoa'] );
         }
 
-        Util::fillClass($this, $params);
+        Util::fillClass( $this, $params );
     }
 
-    /**
-     * @return string
-     */
-    public function getBanco()
+    public static function create( $banco, $agencia, $agenciaDv, $conta, $contaDv, $pessoa ): static
+    {
+        return new static( [
+            'banco'     => $banco,
+            'agencia'   => $agencia,
+            'agenciaDv' => $agenciaDv,
+            'conta'     => $conta,
+            'contaDv'   => $contaDv,
+            'pessoa'    => $pessoa,
+        ] );
+    }
+
+    public function getBanco(): string
     {
         return $this->banco;
     }
 
-    /**
-     * @param $banco
-     * @return Conta
-     */
-    public function setBanco($banco)
+    public function setBanco( $banco ): Conta
     {
         $this->banco = $banco;
-        $this->setBancoNome(isset(Util::$bancos[$this->banco]) ? Util::$bancos[$this->banco] : null);
+        $this->setBancoNome( Util::$bancos[$this->banco] ?? null );
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getBancoNome()
+    public function getBancoNome(): string
     {
         return $this->bancoNome;
     }
 
-    /**
-     * @param $bancoNome
-     * @return Conta
-     */
-    public function setBancoNome($bancoNome)
+    public function setBancoNome( $bancoNome ): Conta
     {
         $this->bancoNome = $bancoNome;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getAgencia()
+    public function getAgencia(): string
     {
         return $this->agencia;
     }
 
-    /**
-     * @param $agencia
-     * @return Conta
-     */
-    public function setAgencia($agencia)
+    public function setAgencia( $agencia ): Conta
     {
         $this->agencia = $agencia;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getAgenciaDv()
+    public function getAgenciaDv(): string
     {
         return $this->agenciaDv;
     }
 
-    /**
-     * @param $agenciaDv
-     * @return Conta
-     */
-    public function setAgenciaDv($agenciaDv)
+    public function setAgenciaDv( $agenciaDv ): Conta
     {
         $this->agenciaDv = $agenciaDv;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getConta()
+    public function getConta(): string
     {
         return $this->conta;
     }
 
-    /**
-     * @param $conta
-     * @return Conta
-     */
-    public function setConta($conta)
+    public function setConta( $conta ): Conta
     {
         $this->conta = $conta;
+
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getContaDv()
+    public function getContaDv(): string
     {
         return $this->contaDv;
     }
 
-    /**
-     * @param $contaDv
-     * @return Conta
-     */
-    public function setContaDv($contaDv)
+    public function setContaDv( $contaDv ): Conta
     {
         $this->contaDv = $contaDv;
+
         return $this;
     }
 
-    /**
-     * @return PessoaContract
-     */
-    public function getPessoa()
+    public function getPessoa(): Pessoa
     {
         return $this->pessoa;
     }
 
-    /**
-     * @param $pessoa
-     * @return Conta
-     */
-    public function setPessoa($pessoa)
+    public function setPessoa( Pessoa $pessoa ): Conta
     {
         $this->pessoa = $pessoa;
+
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return [
-            'banco' => $this->getBanco(),
+            'banco'     => $this->getBanco(),
             'bancoNome' => $this->getBancoNome(),
-            'agencia' => $this->getAgencia(),
+            'agencia'   => $this->getAgencia(),
             'agenciaDv' => $this->getAgenciaDv(),
-            'conta' => $this->getConta(),
-            'contaDv' => $this->getContaDv(),
-            'pessoa' => is_object($this->getPessoa()) && property_exists($this->getPessoa(), 'toArray') ? $this->getPessoa()->toArray() : $this->getPessoa(),
+            'conta'     => $this->getConta(),
+            'contaDv'   => $this->getContaDv(),
+            'pessoa'    => is_object( $this->getPessoa() ) and property_exists( $this->getPessoa(), 'toArray' ) ? $this->getPessoa()
+                                                                                                                       ->toArray() : $this->getPessoa(),
         ];
     }
 }

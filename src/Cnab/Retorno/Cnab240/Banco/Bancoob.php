@@ -1,32 +1,19 @@
 <?php
+
 namespace RedeCauzzoMais\Pagamento\Cnab\Retorno\Cnab240\Banco;
 
 use Exception;
 use RedeCauzzoMais\Pagamento\Cnab\Retorno\Cnab240\AbstractRetorno;
 use RedeCauzzoMais\Pagamento\Cnab\Retorno\Cnab240\Detalhe;
-use RedeCauzzoMais\Pagamento\Contracts\Boleto\Boleto as BoletoContract;
 use RedeCauzzoMais\Pagamento\Contracts\Conta as ContaContract;
 use RedeCauzzoMais\Pagamento\Contracts\Cnab\RetornoCnab240;
+use RedeCauzzoMais\Pagamento\Contracts\Pagamento\Pagamento;
 use RedeCauzzoMais\Pagamento\Util;
 
-/**
- * Class Bancoob
- * @package RedeCauzzoMais\Pagamento\Cnab\Retorno\Cnab240\Banco
- */
 class Bancoob extends AbstractRetorno implements RetornoCnab240
 {
-    /**
-     * Código do banco
-     *
-     * @var string
-     */
-    protected $codigoBanco = BoletoContract::COD_BANCO_BANCOOB;
+    protected $codigoBanco = Pagamento::COD_BANCO_BANCOOB;
 
-    /**
-     * Array com as ocorrencias do banco;
-     *
-     * @var array
-     */
     private $ocorrencias = [
         '00' => 'Crédito ou débito efetivado à indica que o pagamento foi confirmado',
         '01' => 'Insuficiência de fundos - débito não efetuado',
@@ -146,218 +133,186 @@ class Bancoob extends AbstractRetorno implements RetornoCnab240
         'ZJ' => 'Limite de pagamento parciais excedido',
     ];
 
-    /**
-     * Roda antes dos metodos de processar
-     */
     protected function init()
     {
         $this->totais = [
-            'liquidados' => 0,
-            'entradas' => 0,
-            'baixados' => 0,
+            'liquidados'  => 0,
+            'entradas'    => 0,
+            'baixados'    => 0,
             'protestados' => 0,
-            'erros' => 0,
-            'alterados' => 0,
-            'excluidos' => 0,
+            'erros'       => 0,
+            'alterados'   => 0,
+            'excluidos'   => 0,
         ];
     }
 
-    /**
-     * @param array $header
-     * @return bool
-     * @throws Exception
-     */
-    protected function processarHeader(array $header)
+    protected function processarHeader( array $header ): bool
     {
         $this->getHeader()
-            ->setCodBanco($this->rem(1, 3, $header))
-            ->setLoteServico($this->rem(4, 7, $header))
-            ->setTipoRegistro($this->rem(8, 8, $header))
-            ->setTipoInscricao($this->rem(18, 18, $header))
-            ->setNumeroInscricao($this->rem(19, 32, $header))
-            ->setConvenio($this->rem(33, 52, $header))
-            ->setCodigoCedente($this->rem(33, 52, $header))
-            ->setAgencia($this->rem(53, 57, $header))
-            ->setAgenciaDv($this->rem(58, 58, $header))
-            ->setConta($this->rem(59, 70, $header))
-            ->setContaDv($this->rem(71, 71, $header))
-            ->setNomeEmpresa($this->rem(73, 102, $header))
-            ->setDocumentoEmpresa($this->rem(19, 32, $header))
-            ->setNomeBanco($this->rem(103, 132, $header))
-            ->setCodigoRemessaRetorno($this->rem(143, 143, $header))
-            ->setData($this->rem(144, 151, $header))
-            ->setNumeroSequencialArquivo($this->rem(158, 163, $header))
-            ->setVersaoLayoutArquivo($this->rem(164, 166, $header));
+             ->setCodBanco( $this->rem( 1, 3, $header ) )
+             ->setLoteServico( $this->rem( 4, 7, $header ) )
+             ->setTipoRegistro( $this->rem( 8, 8, $header ) )
+             ->setTipoInscricao( $this->rem( 18, 18, $header ) )
+             ->setNumeroInscricao( $this->rem( 19, 32, $header ) )
+             ->setConvenio( $this->rem( 33, 52, $header ) )
+             ->setCodigoCedente( $this->rem( 33, 52, $header ) )
+             ->setAgencia( $this->rem( 53, 57, $header ) )
+             ->setAgenciaDv( $this->rem( 58, 58, $header ) )
+             ->setConta( $this->rem( 59, 70, $header ) )
+             ->setContaDv( $this->rem( 71, 71, $header ) )
+             ->setNomeEmpresa( $this->rem( 73, 102, $header ) )
+             ->setDocumentoEmpresa( $this->rem( 19, 32, $header ) )
+             ->setNomeBanco( $this->rem( 103, 132, $header ) )
+             ->setCodigoRemessaRetorno( $this->rem( 143, 143, $header ) )
+             ->setData( $this->rem( 144, 151, $header ) )
+             ->setNumeroSequencialArquivo( $this->rem( 158, 163, $header ) )
+             ->setVersaoLayoutArquivo( $this->rem( 164, 166, $header ) );
 
-        if (empty($this->getHeader()->getNomeBanco())) {
-            $this->getHeader()->setNomeBanco(Util::$bancos[$this->rem(1, 3, $header)]);
+        if ( empty( $this->getHeader()->getNomeBanco() ) ) {
+            $this->getHeader()->setNomeBanco( Util::$bancos[$this->rem( 1, 3, $header )] );
         }
 
         return true;
     }
 
-    /**
-     * @param array $headerLote
-     *
-     * @return bool
-     * @throws Exception
-     */
-    protected function processarHeaderLote(array $headerLote)
+    protected function processarHeaderLote( array $headerLote ): bool
     {
         $this->getHeaderLote()
-            ->setCodBanco($this->rem(1, 3, $headerLote))
-            ->setNumeroLoteRetorno($this->rem(4, 7, $headerLote))
-            ->setTipoRegistro($this->rem(8, 8, $headerLote))
-            ->setTipoOperacao($this->rem(9, 9, $headerLote))
-            ->setTipoServico($this->rem(10, 11, $headerLote))
-            ->setVersaoLayoutLote($this->rem(14, 16, $headerLote))
-            ->setTipoInscricao($this->rem(18, 18, $headerLote))
-            ->setNumeroInscricao($this->rem(19, 32, $headerLote))
-            ->setConvenio($this->rem(33, 52, $headerLote))
-            ->setAgencia($this->rem(53, 57, $headerLote))
-            ->setAgenciaDv($this->rem(58, 58, $headerLote))
-            ->setConta($this->rem(59, 70, $headerLote))
-            ->setContaDv($this->rem(71, 71, $headerLote))
-            ->setNomeEmpresa($this->rem(73, 102, $headerLote));
+             ->setCodBanco( $this->rem( 1, 3, $headerLote ) )
+             ->setNumeroLoteRetorno( $this->rem( 4, 7, $headerLote ) )
+             ->setTipoRegistro( $this->rem( 8, 8, $headerLote ) )
+             ->setTipoOperacao( $this->rem( 9, 9, $headerLote ) )
+             ->setTipoServico( $this->rem( 10, 11, $headerLote ) )
+             ->setVersaoLayoutLote( $this->rem( 14, 16, $headerLote ) )
+             ->setTipoInscricao( $this->rem( 18, 18, $headerLote ) )
+             ->setNumeroInscricao( $this->rem( 19, 32, $headerLote ) )
+             ->setConvenio( $this->rem( 33, 52, $headerLote ) )
+             ->setAgencia( $this->rem( 53, 57, $headerLote ) )
+             ->setAgenciaDv( $this->rem( 58, 58, $headerLote ) )
+             ->setConta( $this->rem( 59, 70, $headerLote ) )
+             ->setContaDv( $this->rem( 71, 71, $headerLote ) )
+             ->setNomeEmpresa( $this->rem( 73, 102, $headerLote ) );
 
         return true;
     }
 
-    /**
-     * @param array $detalhe
-     * @return bool
-     * @throws Exception
-     */
-    protected function processarDetalhe(array $detalhe)
+    protected function processarDetalhe( array $detalhe ): bool
     {
         /** @var Detalhe $d */
         $d = $this->detalheAtual();
 
-        if ($d->getContaFavorecido() === null) {
-            $d->setContaFavorecido(['pessoa' => ['nome' => '', 'documento' => '']]);
+        if ( $d->getContaFavorecido() === null ) {
+            $d->setContaFavorecido( ['pessoa' => ['nome' => '', 'documento' => '']] );
         }
 
-        if ($this->getSegmentType($detalhe) == 'A') {
-            $d->setOcorrencia($this->rem(231, 240, $detalhe))
-                ->setOcorrenciaDescricao(array_get($this->ocorrencias, $this->detalheAtual()->getOcorrencia(), 'Desconhecida'))
-                ->setNossoNumero($this->rem(135, 154, $detalhe))
-                ->setNumeroDocumento($this->rem(74, 93, $detalhe))
-                ->setDataCredito($this->rem(94, 101, $detalhe))
-                ->setValor(Util::nFloat($this->rem(120, 134, $detalhe)/100, 2, false));
+        if ( $this->getSegmentType( $detalhe ) == 'A' ) {
+            $d->setOcorrencia( $this->rem( 231, 240, $detalhe ) )
+              ->setOcorrenciaDescricao( array_get( $this->ocorrencias, $this->detalheAtual()
+                                                                            ->getOcorrencia(), 'Desconhecida' ) )
+              ->setNossoNumero( $this->rem( 135, 154, $detalhe ) )
+              ->setNumeroDocumento( $this->rem( 74, 93, $detalhe ) )
+              ->setDataCredito( $this->rem( 94, 101, $detalhe ) )
+              ->setValor( Util::toFloat( $this->rem( 120, 134, $detalhe ) / 100, 2, false ) );
 
-            $d->getContaFavorecido()->getPessoa()->setNome($this->rem(44, 73, $detalhe));
+            $d->getContaFavorecido()->getPessoa()->setNome( $this->rem( 44, 73, $detalhe ) );
             $d->getContaFavorecido()
-                ->setBanco($this->rem(21, 23, $detalhe))
-                ->setAgencia($this->rem(24, 28, $detalhe))
-                ->setAgenciaDv($this->rem(29, 29, $detalhe))
-                ->setConta($this->rem(30, 41, $detalhe))
-                ->setContaDv($this->rem(42, 42, $detalhe));
+              ->setBanco( $this->rem( 21, 23, $detalhe ) )
+              ->setAgencia( $this->rem( 24, 28, $detalhe ) )
+              ->setAgenciaDv( $this->rem( 29, 29, $detalhe ) )
+              ->setConta( $this->rem( 30, 41, $detalhe ) )
+              ->setContaDv( $this->rem( 42, 42, $detalhe ) );
 
         }
 
-        if ($this->getSegmentType($detalhe) == 'B') {
-            $d->setDataVencimento($this->rem(128, 135, $detalhe))
-                ->setValorAbatimento(Util::nFloat($this->rem(151, 165, $detalhe)/100, 2, false))
-                ->setValorDesconto(Util::nFloat($this->rem(166, 180, $detalhe)/100, 2, false))
-                ->setValorMora(Util::nFloat($this->rem(181, 195, $detalhe)/100, 2, false))
-                ->setValorMulta(Util::nFloat($this->rem(196, 210, $detalhe)/100, 2, false));
+        if ( $this->getSegmentType( $detalhe ) == 'B' ) {
+            $d->setDataVencimento( $this->rem( 128, 135, $detalhe ) )
+              ->setValorAbatimento( Util::toFloat( $this->rem( 151, 165, $detalhe ) / 100, 2, false ) )
+              ->setValorDesconto( Util::toFloat( $this->rem( 166, 180, $detalhe ) / 100, 2, false ) )
+              ->setValorMora( Util::toFloat( $this->rem( 181, 195, $detalhe ) / 100, 2, false ) )
+              ->setValorMulta( Util::toFloat( $this->rem( 196, 210, $detalhe ) / 100, 2, false ) );
 
-            $documento = $this->rem(19, 32, $detalhe);
+            $documento = $this->rem( 19, 32, $detalhe );
 
-//            if ($this->rem(18, 18, $detalhe) == 1) {
-//                $documento = substr($documento, 3);
-//            }
+            //            if ($this->rem(18, 18, $detalhe) == 1) {
+            //                $documento = substr($documento, 3);
+            //            }
 
-            if ($d->getContaFavorecido() instanceof ContaContract) {
-                $d->getContaFavorecido()->getPessoa()->setDocumento($documento);
+            if ( $d->getContaFavorecido() instanceof ContaContract ) {
+                $d->getContaFavorecido()->getPessoa()->setDocumento( $documento );
             }
         }
 
-        if ($d->getContaPagador() === null) {
-            $d->setContaPagador([
-                'banco' => $this->getHeader()->getCodBanco(),
-                'agencia' => $this->getHeader()->getAgencia(),
+        if ( $d->getContaPagador() === null ) {
+            $d->setContaPagador( [
+                'banco'     => $this->getHeader()->getCodBanco(),
+                'agencia'   => $this->getHeader()->getAgencia(),
                 'agenciaDv' => $this->getHeader()->getAgenciaDv(),
-                'conta' => $this->getHeader()->getConta(),
-                'contaDv' => $this->getHeader()->getContaDv(),
-                'pessoa' => [
-                    'nome' => $this->getHeader()->getNomeEmpresa(),
+                'conta'     => $this->getHeader()->getConta(),
+                'contaDv'   => $this->getHeader()->getContaDv(),
+                'pessoa'    => [
+                    'nome'      => $this->getHeader()->getNomeEmpresa(),
                     'documento' => $this->getHeader()->getDocumentoEmpresa(),
                 ],
-            ]);
+            ] );
         }
 
-        if ($this->getSegmentType($detalhe) == 'U') {
-            $d->setValorDesconto(Util::nFloat($this->rem(33, 47, $detalhe)/100, 2, false))
-                ->setValorAbatimento(Util::nFloat($this->rem(48, 62, $detalhe)/100, 2, false))
-                ->setValorIOF(Util::nFloat($this->rem(63, 77, $detalhe)/100, 2, false))
-                ->setValorRecebido(Util::nFloat($this->rem(93, 107, $detalhe)/100, 2, false))
-                ->setDataOcorrencia($this->rem(138, 145, $detalhe))
-                ->setDataCredito($this->rem(146, 153, $detalhe));
+        if ( $this->getSegmentType( $detalhe ) == 'U' ) {
+            $d->setValorDesconto( Util::toFloat( $this->rem( 33, 47, $detalhe ) / 100, 2, false ) )
+              ->setValorAbatimento( Util::toFloat( $this->rem( 48, 62, $detalhe ) / 100, 2, false ) )
+              ->setValorIOF( Util::toFloat( $this->rem( 63, 77, $detalhe ) / 100, 2, false ) )
+              ->setValorRecebido( Util::toFloat( $this->rem( 93, 107, $detalhe ) / 100, 2, false ) )
+              ->setDataOcorrencia( $this->rem( 138, 145, $detalhe ) )
+              ->setDataCredito( $this->rem( 146, 153, $detalhe ) );
         }
 
-        if ($this->getSegmentType($detalhe) == 'Z') {
-            $d->setOcorrencia($this->rem(231, 240, $detalhe));
+        if ( $this->getSegmentType( $detalhe ) == 'Z' ) {
+            $d->setOcorrencia( $this->rem( 231, 240, $detalhe ) );
         }
 
-        /**
-         * ocorrencias
-         */
-        if ($d->hasOcorrencia('00', '03', 'BQ', 'ZK')) {
+        if ( $d->hasOcorrencia( '00', '03', 'BQ', 'ZK' ) ) {
             $this->totais['liquidados']++;
-            $d->setOcorrenciaTipo($d::OCORRENCIA_LIQUIDADA);
-        } elseif ($d->hasOcorrencia('BD', 'BN')) {
+            $d->setOcorrenciaTipo( $d::OCORRENCIA_LIQUIDADA );
+        } elseif ( $d->hasOcorrencia( 'BD', 'BN' ) ) {
             $this->totais['entradas']++;
-            $d->setOcorrenciaTipo($d::OCORRENCIA_ENTRADA);
-        } elseif ($d->hasOcorrencia('14', '40', 'K2')) {
+            $d->setOcorrenciaTipo( $d::OCORRENCIA_ENTRADA );
+        } elseif ( $d->hasOcorrencia( '14', '40', 'K2' ) ) {
             $this->totais['protestados']++;
-            $d->setOcorrenciaTipo($d::OCORRENCIA_PROTESTADA);
-        } elseif ($d->hasOcorrencia('BE', 'BO')) {
+            $d->setOcorrenciaTipo( $d::OCORRENCIA_PROTESTADA );
+        } elseif ( $d->hasOcorrencia( 'BE', 'BO' ) ) {
             $this->totais['alterados']++;
-            $d->setOcorrenciaTipo($d::OCORRENCIA_ALTERACAO);
-        } elseif ($d->hasOcorrencia('BF', 'BP')) {
+            $d->setOcorrenciaTipo( $d::OCORRENCIA_ALTERACAO );
+        } elseif ( $d->hasOcorrencia( 'BF', 'BP' ) ) {
             $this->totais['excluidos']++;
-            $d->setOcorrenciaTipo($d::OCORRENCIA_BAIXADA);
+            $d->setOcorrenciaTipo( $d::OCORRENCIA_BAIXADA );
         } else {
-            if (isset($this->ocorrencias[$d->getOcorrencia()])) {
-                $d->setError($this->ocorrencias[$d->getOcorrencia()]);
+            if ( isset( $this->ocorrencias[$d->getOcorrencia()] ) ) {
+                $d->setError( $this->ocorrencias[$d->getOcorrencia()] );
             }
 
-            $d->setOcorrenciaTipo($d::OCORRENCIA_OUTROS);
+            $d->setOcorrenciaTipo( $d::OCORRENCIA_OUTROS );
         }
 
         return true;
     }
 
-    /**
-     * @param array $trailer
-     *
-     * @return bool
-     * @throws Exception
-     */
-    protected function processarTrailerLote(array $trailer)
+    protected function processarTrailerLote( array $trailer ): bool
     {
         $this->getTrailerLote()
-            ->setLoteServico($this->rem(4, 7, $trailer))
-            ->setTipoRegistro($this->rem(8, 8, $trailer))
-            ->setQtdRegistroLote((int) $this->rem(18, 23, $trailer))
-            ->setValorTotalTitulos(Util::nFloat($this->rem(24, 41, $trailer)/100, 2, false));
+             ->setLoteServico( $this->rem( 4, 7, $trailer ) )
+             ->setTipoRegistro( $this->rem( 8, 8, $trailer ) )
+             ->setQtdRegistroLote( (int) $this->rem( 18, 23, $trailer ) )
+             ->setValorTotalTitulos( Util::toFloat( $this->rem( 24, 41, $trailer ) / 100, 2, false ) );
 
         return true;
     }
 
-    /**
-     * @param array $trailer
-     * @return bool
-     * @throws Exception
-     */
-    protected function processarTrailer(array $trailer)
+    protected function processarTrailer( array $trailer ): bool
     {
         $this->getTrailer()
-            ->setNumeroLote($this->rem(4, 7, $trailer))
-            ->setTipoRegistro($this->rem(8, 8, $trailer))
-            ->setQtdLotesArquivo((int) $this->rem(18, 23, $trailer))
-            ->setQtdRegistroArquivo((int) $this->rem(24, 29, $trailer));
+             ->setNumeroLote( $this->rem( 4, 7, $trailer ) )
+             ->setTipoRegistro( $this->rem( 8, 8, $trailer ) )
+             ->setQtdLotesArquivo( (int) $this->rem( 18, 23, $trailer ) )
+             ->setQtdRegistroArquivo( (int) $this->rem( 24, 29, $trailer ) );
 
         return true;
     }

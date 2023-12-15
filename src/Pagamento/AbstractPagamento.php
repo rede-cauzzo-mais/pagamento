@@ -38,7 +38,20 @@ abstract class AbstractPagamento implements PagamentoContract
      *
      * @var array
      */
-    protected $finalidadesTED = ['00001', '00002', '00003', '00004', '00005', '00006', '00007', '00008', '00009', '00010', '00011', '00101',];
+    protected $finalidadesTED = [
+        '00001',
+        '00002',
+        '00003',
+        '00004',
+        '00005',
+        '00006',
+        '00007',
+        '00008',
+        '00009',
+        '00010',
+        '00011',
+        '00101',
+    ];
 
     /**
      * Valor total do pagamento
@@ -157,7 +170,7 @@ abstract class AbstractPagamento implements PagamentoContract
      */
     protected function setCamposObrigatorios()
     {
-        $args                     = func_get_args();
+        $args = func_get_args();
         $this->camposObrigatorios = [];
         foreach ( $args as $arg ) {
             $this->addCampoObrigatorio( $arg );
@@ -282,8 +295,9 @@ abstract class AbstractPagamento implements PagamentoContract
      */
     public function setFinalidade( $finalidade )
     {
-        if ( !in_array( $finalidade, $this->getFinalidadesTED() ) )
+        if ( !in_array( $finalidade, $this->getFinalidadesTED() ) ) {
             throw new Exception( 'Finalidade não encontrada' );
+        }
 
         $this->finalidade = $finalidade;
 
@@ -326,11 +340,6 @@ abstract class AbstractPagamento implements PagamentoContract
         return $this;
     }
 
-    /**
-     * Retorna a entidade beneficiario
-     *
-     * @return PessoaContract
-     */
     public function getFavorecido()
     {
         return $this->favorecido;
@@ -465,7 +474,7 @@ abstract class AbstractPagamento implements PagamentoContract
      */
     public function setValor( $valor )
     {
-        $this->valor = Util::nFloat( $valor, 2, false );
+        $this->valor = Util::toFloat( $valor, 2, false );
 
         return $this;
     }
@@ -477,7 +486,7 @@ abstract class AbstractPagamento implements PagamentoContract
      */
     public function getValor()
     {
-        return Util::nFloat( $this->valor, 2, false );
+        return Util::toFloat( $this->valor, 2, false );
     }
 
     /**

@@ -2,57 +2,27 @@
 
 namespace RedeCauzzoMais\Pagamento\Contracts\Cnab;
 
-use RedeCauzzoMais\Pagamento\Support\Collection;
+use Illuminate\Support\Collection;
 
 interface RetornoCnab240 extends Cnab
 {
-    /**
-     * @return mixed
-     */
     public function getCodigoBanco();
 
-    /**
-     * @return mixed
-     */
     public function getBancoNome();
 
-    /**
-     * @return Collection
-     */
-    public function getDetalhes();
+    public function getDetalhes(): Collection;
 
-    /**
-     * @return Retorno\Cnab240\Detalhe
-     */
-    public function getDetalhe($i);
+    public function getDetalhe( int $i ): ?Retorno\Cnab240\Detalhe;
 
-    /**
-     * @return Retorno\Cnab240\Header
-     */
-    public function getHeader();
+    public function getHeader(): Retorno\Cnab240\Header;
 
-    /**
-     * @return Retorno\Cnab240\HeaderLote
-     */
-    public function getHeaderLote();
+    public function getHeaderLote(): Retorno\Cnab240\HeaderLote;
 
-    /**
-     * @return Retorno\Cnab240\TrailerLote
-     */
-    public function getTrailerLote();
+    public function getTrailerLote(): Retorno\Cnab240\TrailerLote;
 
-    /**
-     * @return Retorno\Cnab240\Trailer
-     */
-    public function getTrailer();
+    public function getTrailer(): Retorno\Cnab240\Trailer;
 
-    /**
-     * @return string
-     */
     public function processar();
 
-    /**
-     * @return array
-     */
-    public function toArray();
+    public function toArray(): array;
 }

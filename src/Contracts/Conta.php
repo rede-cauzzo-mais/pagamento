@@ -10,39 +10,17 @@ use RedeCauzzoMais\Pagamento\Contracts\Pessoa as PessoaContract;
  */
 interface Conta
 {
-    /**
-     * @return mixed
-     */
-    public function getBanco();
+    public function getBanco(): mixed;
 
-    /**
-     * @return mixed
-     */
-    public function getBancoNome();
+    public function getBancoNome(): mixed;
 
-    /**
-     * @return mixed
-     */
-    public function getAgencia();
+    public function getAgencia(): mixed;
 
-    /**
-     * @return mixed
-     */
-    public function getAgenciaDv();
+    public function getAgenciaDv(): mixed;
 
-    /**
-     * @return mixed
-     */
-    public function getConta();
+    public function getConta(): mixed;
 
-    /**
-     * @return mixed
-     */
-    public function getContaDv();
+    public function getContaDv(): mixed;
 
-    /**
-     * @return PessoaContract
-     */
-    public function getPessoa();
-
+    public function getPessoa(): PessoaContract;
 }

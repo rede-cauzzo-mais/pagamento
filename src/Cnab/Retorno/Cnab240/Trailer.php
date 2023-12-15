@@ -8,100 +8,54 @@ use RedeCauzzoMais\Pagamento\Traits\MagicTrait;
 class Trailer implements TrailerContract
 {
     use MagicTrait;
-    /**
-     * @var integer
-     */
+
     protected $numeroLote;
-
-    /**
-     * @var integer
-     */
     protected $tipoRegistro;
-
-    /**
-     * @var integer
-     */
     protected $qtdLotesArquivo;
-
-    /**
-     * @var integer
-     */
     protected $qtdRegistroArquivo;
 
-    /**
-     * @return mixed
-     */
-    public function getTipoRegistro()
+    public function getTipoRegistro(): ?int
     {
         return $this->tipoRegistro;
     }
 
-    /**
-     * @param mixed $numeroLote
-     *
-     * @return $this
-     */
-    public function setNumeroLote($numeroLote)
+    public function setNumeroLote( int $numeroLote ): self
     {
         $this->numeroLote = $numeroLote;
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getNumeroLote()
+    public function getNumeroLote(): ?int
     {
         return $this->numeroLote;
     }
 
-    /**
-     * @param mixed $qtdLotesArquivo
-     *
-     * @return $this
-     */
-    public function setQtdLotesArquivo($qtdLotesArquivo)
+    public function setQtdLotesArquivo( int $qtdLotesArquivo ): self
     {
         $this->qtdLotesArquivo = $qtdLotesArquivo;
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getQtdLotesArquivo()
+    public function getQtdLotesArquivo(): ?int
     {
         return $this->qtdLotesArquivo;
     }
 
-    /**
-     * @param mixed $qtdRegistroArquivo
-     *
-     * @return $this
-     */
-    public function setQtdRegistroArquivo($qtdRegistroArquivo)
+    public function setQtdRegistroArquivo( int $qtdRegistroArquivo ): self
     {
         $this->qtdRegistroArquivo = $qtdRegistroArquivo;
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getQtdRegistroArquivo()
+    public function getQtdRegistroArquivo(): ?int
     {
         return $this->qtdRegistroArquivo;
     }
 
-    /**
-     * @param mixed $tipoRegistro
-     *
-     * @return $this
-     */
-    public function setTipoRegistro($tipoRegistro)
+    public function setTipoRegistro( int $tipoRegistro ): self
     {
         $this->tipoRegistro = $tipoRegistro;
 

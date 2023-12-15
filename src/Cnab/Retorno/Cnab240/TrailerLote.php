@@ -5,108 +5,57 @@ namespace RedeCauzzoMais\Pagamento\Cnab\Retorno\Cnab240;
 use RedeCauzzoMais\Pagamento\Contracts\Cnab\Retorno\Cnab240\TrailerLote as TrailerLoteContract;
 use RedeCauzzoMais\Pagamento\Traits\MagicTrait;
 
-/**
- * Class TrailerLote
- * @package RedeCauzzoMais\Pagamento\Cnab\Retorno\Cnab240
- */
 class TrailerLote implements TrailerLoteContract
 {
     use MagicTrait;
-    /**
-     * @var integer
-     */
+
     protected $loteServico;
-
-    /**
-     * @var integer
-     */
     protected $TipoRegistro;
-
-    /**
-     * @var integer
-     */
     protected $qtdRegistroLote;
-
-    /**
-     * @var float
-     */
     protected $valorTotalTitulos;
 
-    /**
-     * @return mixed
-     */
-    public function getLoteServico()
+    public function getLoteServico(): ?int
     {
         return $this->loteServico;
     }
 
-    /**
-     * @param mixed $loteServico
-     *
-     * @return $this
-     */
-    public function setLoteServico($loteServico)
+    public function setLoteServico( int $loteServico ): self
     {
         $this->loteServico = $loteServico;
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getQtdRegistroLote()
+    public function getQtdRegistroLote(): ?int
     {
         return $this->qtdRegistroLote;
     }
 
-    /**
-     * @param mixed $qtdRegistroLote
-     *
-     * @return $this
-     */
-    public function setQtdRegistroLote($qtdRegistroLote)
+    public function setQtdRegistroLote( int $qtdRegistroLote ): self
     {
         $this->qtdRegistroLote = $qtdRegistroLote;
 
         return $this;
     }
 
-
-    /**
-     * @return mixed
-     */
-    public function getTipoRegistro()
+    public function getTipoRegistro(): ?int
     {
         return $this->TipoRegistro;
     }
 
-    /**
-     * @param mixed $TipoRegistro
-     *
-     * @return $this
-     */
-    public function setTipoRegistro($TipoRegistro)
+    public function setTipoRegistro( int $TipoRegistro ): self
     {
         $this->TipoRegistro = $TipoRegistro;
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getValorTotalTitulos()
+    public function getValorTotalTitulos(): ?float
     {
         return $this->valorTotalTitulos;
     }
 
-    /**
-     * @param mixed $valorTotalTitulos
-     *
-     * @return $this
-     */
-    public function setValorTotalTitulos($valorTotalTitulos)
+    public function setValorTotalTitulos( float $valorTotalTitulos ): self
     {
         $this->valorTotalTitulos = $valorTotalTitulos;
 

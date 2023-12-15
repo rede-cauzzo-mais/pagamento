@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": "^8.2.0",
+        "ext-iconv": "*",
         "ext-intl": "*",
         "ext-mbstring": "*",
         "laravel/framework": "^9.0|^10.0"
